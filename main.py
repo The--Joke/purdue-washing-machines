@@ -5,12 +5,10 @@ import time
 import datetime
 import csv
 
-import openpyxl
-
 mainurl = "http://wpvitassuds01.itap.purdue.edu/washalertweb/washalertweb.aspx?location="
 dat = []
 
-#yikes 
+#yikes
 locations = [["Cary Quad East Laundry","000f2375-7317-4a89-b836-4140dcd49b7c"],
              ["Cary Quad West Laundry","f9db4842-8fae-47d6-8660-645d358ef739"],
              ["Earthart Laundry Room","a0728ede-60be-4155-8ca9-dcde37ad431d"],
@@ -30,9 +28,6 @@ locations = [["Cary Quad East Laundry","000f2375-7317-4a89-b836-4140dcd49b7c"],
 
 
 class DataScraper(HTMLParser):
-    pull = False
-    
-
     def __init__(self,name):
         self.hallname = name
         self.data = {"Available":0,
@@ -43,14 +38,13 @@ class DataScraper(HTMLParser):
             "Almost done":0,
             "Not online":0,
             "Out of order":0}
+        self.pull = False
+
         super().__init__()
-        
+
     def handle_starttag(self,tag,attrs):
         if tag == "td" and ("class","status") in attrs:
             self.pull = True
-
-    def handle_endtag(self,tag):
-        pass
 
     def handle_data(self,data):
         if self.pull:
@@ -58,18 +52,18 @@ class DataScraper(HTMLParser):
             self.data[data]+=1
 
 def appendRow(row):
-
     # append row to .csv
     with open("data.csv","a",newline="") as f:
         writer = csv.writer(f)
         writer.writerow(row)
 
 def pull():
+    global dat
     n=[]
 
     t = datetime.datetime.now()
     n.append("{0}-{1}-{2} {3}:{4}".format(t.year,t.month,t.day,t.hour,t.minute))
-    
+
     for i in locations:
         scraper = DataScraper(i[0])
 
@@ -80,17 +74,16 @@ def pull():
 
     try:
         # try to empty buffer.
-        global dat
         if dat:
             for i in dat:
-                print("Writing index { ", str(i), " } of dat retroactively")
                 appendRow(i)
+
             dat = []
-                
+
         appendRow(n)
     except:
         # add file to buffer when spreadsheet is open so it is written on the next go
-        print("File was open when tried to write.")
+        print("File was open when tried to write. Adding line to buffer.")
         dat.append(n)
 
     print("Hillenbrand currently has", n[6], "washing machines available.")

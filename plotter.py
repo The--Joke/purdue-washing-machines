@@ -1,13 +1,12 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
-import openpyxl
 import datetime
 import csv
 
 DATE = 1
 HILLENBRAND = 6
-FILE = "Book1.xlsx"
+FILE = "data.csv"
 
 
 def pull_data(x):
@@ -15,11 +14,11 @@ def pull_data(x):
     data = []
 
     # pull data from csv
-    with open("data.csv","r",newline="") as f:
+    with open(FILE,"r",newline="") as f:
         reader = csv.reader(f)
         iterRow = iter(reader)
         next(iterRow)
-        
+
         for row in iterRow:
             dates.append(row[0])
             data.append(row[HILLENBRAND])
@@ -43,4 +42,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
